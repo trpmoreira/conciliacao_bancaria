@@ -1,0 +1,47 @@
+# Ambiente virtual (ex: venv/)
+venv/
+.env
+
+# Ficheiros de base de dados SQLite
+*.sqlite3
+*.db
+
+# Ficheiros temporários e caches
+__pycache__/
+*.py[cod]
+*.log
+*.tmp
+*.bak
+
+# Caches do Python
+.cache/
+*.pyo
+*.pyd
+
+# Jupyter Notebooks (se algum dia usares)
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# Ficheiros de build
+build/
+dist/
+*.egg-info/
+
+# Ficheiros gerados por o sistema operativo
+.DS_Store
+Thumbs.db
+
+# Relatórios/ficheiros de exportação
+*.xlsx
+*.xls
+*.csv
+
+# Outros ficheiros que queres manter locais
+*.secrets.*
+*.key
+*.pem
