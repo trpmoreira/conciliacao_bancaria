@@ -3,6 +3,10 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 
+from app.models.sqlite.bancos import Banco
+from app.models.sqlite.movimentos_phc import PHCMovimento
+from app.models.sqlite.base import Base
+
 load_dotenv()
 
 server = os.getenv('server_phc')
@@ -10,18 +14,21 @@ database = os.getenv('database_phc')
 username = os.getenv('username_phc')
 password = os.getenv('password_phc')
 
-connection_string = f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server'
+connection_string_phc = f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server'
 
-engine = create_engine(connection_string)
+engine_phc = create_engine(connection_string_phc)
+engine_sqlite = create_engine(os.getenv('DATABASE_URL_SQLLITE'))
 
-# Criação do session
-session = sessionmaker(bind=engine)
+#Criar as tabelas em sqlite
+def init_db():
+    Base.metadata.create_all(engine_sqlite)
+
+Session = sessionmaker(bind=engine_sqlite)
 
 
 def test_phc_connection():
-    print(connection_string)
     try:
-        conn = engine.connect()
+        conn = engine_phc.connect()
         cursor = conn.connection.cursor()
         cursor.execute("SELECT top 1 * FROM ml")
         conn.close()
@@ -29,10 +36,18 @@ def test_phc_connection():
     except Exception as e:
         return {"Status": "Error", "Message": str(e)}
 
+def test_sqlite_connection():
+    try:
+        conn = engine_sqlite.connect()
+        conn.close()
+        return {"Status": "OK", "Message": "Conexão com SQLite estabelecida"}
+    except Exception as e:
+        return {"Status": "Error", "Message": str(e)}
+
 
 def get_entries_by_date(year: int, month: int):
     try:
-        conn = engine.connect()
+        conn = engine_phc.connect()
         cursor = conn.connection.cursor()
         cursor.execute(f"""
             SELECT top 10 CONVERT(VARCHAR(10), data, 103) AS 'Data',
@@ -71,3 +86,50 @@ def get_entries_by_date(year: int, month: int):
         return True, f"{len(entries)} lançamentos encontrados", entries
     except Exception as e:
         return {"Status": "Error", "Message": str(e)}
+
+
+def get_bancos():
+    try:
+        session = Session()
+        bancos = session.query(Banco).all()
+        session.close()
+
+        banco_dicts = []
+
+        for banco in bancos:
+            banco_dicts.append({
+                "id": banco.id,
+                "nome_banco": banco.nome_banco.strip(),
+                "nome_conta": banco.nome_conta.strip(),
+                "conta_phc": banco.conta_phc.strip(),
+                "nome_folha": banco.nome_folha.strip(),
+                "codigo_banco": banco.codigo_banco.strip()
+            })
+
+        return banco_dicts
+
+
+    except Exception as e:
+        return {"Status": "Error 40", "Message": str(e)}
+
+def create_banco(nome_banco: str, nome_conta: str, conta_phc: str, nome_folha: str, codigo_banco: str):
+    try:
+        session = Session()
+        banco = Banco(nome_banco=nome_banco, nome_conta=nome_conta, conta_phc=conta_phc, nome_folha=nome_folha, codigo_banco=codigo_banco)
+        session.add(banco)
+        session.commit()
+        session.close()
+        return {"Status": "OK", "Message": f"Conta {nome_conta}, do banco {nome_banco} criada com sucesso"}
+    except Exception as e:
+        return {"Status": "Error", "Message": str(e)}
+
+def delete_by_id(id: int):
+    try:
+        session = Session()
+        session.query(Banco).filter(Banco.id == id).delete()
+        session.commit()
+        session.close()
+        return {"Status": "OK", "Message": f"Conta {id} eliminada com sucesso"}
+    except Exception as e:
+        return {"Status": "Error", "Message": str(e)}
+
