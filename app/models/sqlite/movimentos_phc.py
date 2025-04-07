@@ -1,5 +1,6 @@
-# app/models/phc_movimento.py
+# app/models/sqlite/movimentos_phc.py
 from sqlalchemy import Column, Integer, String, Date, Float, Text, ForeignKey
+from sqlalchemy.orm import relationship
 from app.models.sqlite.base import Base
 
 class PHCMovimento(Base):
@@ -22,4 +23,6 @@ class PHCMovimento(Base):
     observacoes = Column(Text)
 
     ano_mes = Column(String, nullable=False)
-    banco_id = Column(Integer, ForeignKey("bancos.id"))
+    id_conta_bancaria = Column(Integer, ForeignKey("contas_bancarias.id"))
+
+    conta_bancaria = relationship("ContaBancaria", back_populates="movimentos")

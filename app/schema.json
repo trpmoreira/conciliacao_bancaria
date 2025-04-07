@@ -1,0 +1,62 @@
+file_names = {
+  "120101": "Santander DO",
+  "120102": "Santander CR",
+  "120301": "BCP DO",
+  "120302": "BCP 2",
+  "120303": "BCP 3",
+  "120304": "BCP 4",
+  "120401": "Montepio DO",
+  "120501": "BIC DO",
+  "120601": "CGD DO"
+}
+
+
+banco_codes = {
+"120101": "01",
+"120102": "02",
+"120103": "03",
+"120301": "04",
+"120302": "05",
+"120401": "06",
+"120201": "07",
+"120501": "09",
+"120601": "08",
+"120303": "12",
+"120304": "13"
+}
+
+mapeamento = {
+"STD DO": "120101",
+"STD CR": "120102",
+"BCP DO": "120301",
+"BCP 2": "120302",
+"BCP 3": "120303",
+"BCP 4": "120304",
+"Montepio": "120401",
+"BIC": "120501",
+"CGD": "120601"
+}
+
+mapeamento_colunas_valor = {
+"STD DO": "Montante",  # Coluna E
+"STD CR": "Montante",
+"BCP DO": "Valor",     # Coluna H
+"BCP 2": "Valor",
+"BCP 3": "Valor",
+"BCP 4": "Valor",
+"Montepio": "IMPORTÂNCIA",   # Ajustar nome correto
+"BIC": "Valor",        # Ajustar nome correto
+"CGD": "Montante "         # Ajustar nome correto
+}
+
+mapeamento_colunas_descricao = {
+"STD DO": "Descrição da Conta",  # Coluna F
+"STD CR": "Descrição da Conta",
+"BCP DO": "Descricao",     # Coluna I
+"BCP 2": "Descricao",
+"BCP 3": "Descricao",
+"BCP 4": "Descricao",
+"Montepio": "DESCRIÇÃO",   # Ajustar nome correto
+"BIC": "Descrição",        # Ajustar nome correto
+"CGD": "Montante "         # Ajustar nome correto
+}

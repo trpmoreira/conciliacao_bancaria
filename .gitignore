@@ -1,3 +1,6 @@
+# Ficheiros de configuração
+seed.py
+
 # Ambiente virtual (ex: venv/)
 venv/
 .env
