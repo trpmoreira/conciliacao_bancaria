@@ -1,5 +1,5 @@
 # app/models/sqlite/conta_bancaria.py
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from app.models.sqlite.base import Base
 
@@ -13,6 +13,8 @@ class ContaBancaria(Base):
     excel_nome_folha = Column(String, nullable=False, unique=True)
     excel_nome_descricao = Column(String, nullable=False)
     excel_nome_valor = Column(String, nullable=False)
+    excel_nome_codigo_mecanografico = Column(String, nullable=False)
+    excel_nome_data = Column(String, nullable=False)
     codigo_banco = Column(String, nullable=False, unique=True)
 
 

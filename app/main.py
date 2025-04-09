@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db_info import create_banco, delete_banco_by_id, get_bancos, get_contas_bancarias, get_entries_by_date, get_entries_by_date_account, init_db, test_phc_connection, test_sqlite_connection
 from app.schemas.phc_entries import PHCEntry
+from app.services.importacao_bancos import importar_movimentos_banco
 from app.services.importacao_phc import importar_movimentos_phc
 
 app = FastAPI()
@@ -80,3 +81,17 @@ def create_new_banco(nome_banco: str):
 @app.post("/importacao_phc/{ano}/{mes}")
 def importacao_phc(ano: int, mes: int):
     return importar_movimentos_phc(ano, mes)
+
+@app.post("/importacao_bancos/{ano}/{mes}")
+def importacao_bancos(ano: int, mes: int):
+    return importar_movimentos_banco(ano, mes)
+
+@app.get("/bancos/extrato/{ano}/{mes}/{account_id}")
+def get_entries_by_account_and_period(ano: int, mes: int, account_id: int):
+    return get_entries_by_account_and_period(ano, mes, account_id)
+
+@app.delete("/bancos/extrato/{ano}/{mes}/{account_id}")
+def delete_entries_by_account_and_period(ano: int, mes: int, account_id: int):
+    return delete_entries_by_account_and_period(ano, mes, account_id)
+
+

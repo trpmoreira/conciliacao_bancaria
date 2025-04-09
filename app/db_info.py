@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 
+from app.models.sqlite.banco_extrato import BancoExtrato
 from app.models.sqlite.base import Base
 from app.models.sqlite.banco import Banco
 from app.models.sqlite.conta_bancaria import ContaBancaria
@@ -203,6 +204,25 @@ def delete_banco_by_id(id: int):
         session.commit()
         session.close()
         return {"Status": "OK", "Message": f"Conta {id} eliminada com sucesso"}
+    except Exception as e:
+        return {"Status": "Error", "Message": str(e)}
+
+def get_entries_by_account_and_period(mes: int, ano: int, account_id: int):
+    try:
+        session = Session()
+        entries = session.query(BancoExtrato).filter(BancoExtrato.id_conta_bancaria == account_id, BancoExtrato.ano_mes == f"{ano}{mes:02d}").all()
+        session.close()
+        return entries
+    except Exception as e:
+        return {"Status": "Error", "Message": str(e)}
+
+def delete_entries_by_account_and_period(account_id: int, mes: int, ano: int):
+    try:
+        session = Session()
+        session.query(BancoExtrato).filter(BancoExtrato.id_conta_bancaria == account_id, BancoExtrato.ano_mes == f"{ano}{mes:02d}").delete()
+        session.commit()
+        session.close()
+        return {"Status": "OK", "Message": f"Lançamentos eliminados com sucesso"}
     except Exception as e:
         return {"Status": "Error", "Message": str(e)}
 
