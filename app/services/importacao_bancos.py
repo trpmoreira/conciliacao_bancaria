@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 import pandas as pd
 from app.models.sqlite.conta_bancaria import ContaBancaria
@@ -17,7 +18,7 @@ def importar_movimentos_banco(ano: int, mes: int):
     path_ficheiro = os.path.join("files", "bank_sheets", ficheiro_nome)
 
     if not os.path.exists(path_ficheiro):
-        raise FileNotFoundError(f"Ficheiro {ficheiro_nome} não encontrado")
+        raise HTTPException(status_code=404, detail=f"Ficheiro {ficheiro_nome} não encontrado")
 
     deleted_entries = {}
     new_entries = {}
@@ -25,6 +26,7 @@ def importar_movimentos_banco(ano: int, mes: int):
     contas = session.query(ContaBancaria).all()
 
     for conta in contas:
+        new_entries[conta.id] = 0
 
         try:
             deleted_entries[conta.id] = session.query(BancoExtrato).filter(BancoExtrato.id_conta_bancaria == conta.id, BancoExtrato.ano_mes == f"{ano}{mes:02d}").count()
@@ -39,30 +41,26 @@ def importar_movimentos_banco(ano: int, mes: int):
             print(f"Erro ao ler a folha '{conta.excel_nome_folha}': {e}")
             continue
 
+        # Converte a coluna de datas de forma vetorizada
+        df.rename(columns={conta.excel_nome_data: "data"}, inplace=True)
+        df["data"] = pd.to_datetime(df["data"], errors='coerce', dayfirst=True).fillna(pd.Timestamp(f"{ano}-{mes:02d}-01"))
+
+        coluna_valor = conta.excel_nome_valor
+        df[coluna_valor] = pd.to_numeric(
+            df[coluna_valor]
+            .astype(str)
+            .str.replace('.', '', regex=False)
+            .str.replace(',', '.', regex=False),
+            errors='coerce'
+        ).fillna(0.0)
+
         for _, row in df.iterrows():
+
             descricao = str(row.get(conta.excel_nome_descricao, ""))
             valor = row.get(conta.excel_nome_valor, 0)
             codigo_mecanografico = row.get(conta.excel_nome_codigo_mecanografico, "")
-            data_raw = row.get(conta.excel_nome_data)
+            data = row["data"].date()
 
-            # Normalizar data para objeto datetime.date
-            if isinstance(data_raw, pd.Timestamp):
-                data = data_raw.date()
-            elif isinstance(data_raw, datetime):
-                data = data_raw.date()
-            elif isinstance(data_raw, date):
-                data = data_raw
-            elif isinstance(data_raw, str):
-                try:
-                    data = datetime.strptime(data_raw.strip(), "%d/%m/%Y").date()
-                except ValueError:
-                    try:
-                        data = datetime.strptime(data_raw.strip(), "%Y-%m-%d").date()
-                    except ValueError:
-                        print(f"⚠️ Data inválida '{data_raw}' na conta {conta.nome_conta}, usando o primeiro dia do mês.")
-                        data = date(ano, mes, 1)
-            else:
-                data = date(ano, mes, 1)
 
             movimento = BancoExtrato(
                 nome_conta=conta.nome_conta,
@@ -77,6 +75,10 @@ def importar_movimentos_banco(ano: int, mes: int):
             session.add(movimento)
             new_entries[conta.id] = new_entries.get(conta.id, 0) + 1
 
+        print(f"{new_entries[conta.id]} movimentos da conta {conta.nome_conta} importados com sucesso para o mês de {mes}/{ano}")
+
+    message = f"Movimentos importados com sucesso para o mês de {mes}/{ano}"
+
     session.commit()
 
-    return {"message": "Movimentos importados com sucesso", "deleted_entries": deleted_entries, "new_entries": new_entries}
+    return {"message": message, "deleted_entries": deleted_entries, "new_entries": new_entries}

@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db_info import create_banco, delete_banco_by_id, delete_entries_by_account_and_period, get_bancos, get_contas_bancarias, get_entries_by_account_and_period, get_entries_by_date, get_entries_by_date_account, init_db, test_phc_connection, test_sqlite_connection
 from app.schemas.phc_entries import PHCEntry
+from app.services.bank_sheet_bulk import bank_bulk_import
+from app.services.upload_bank_xlxs import upload_bank_sheet
 from app.services.importacao_bancos import importar_movimentos_banco
 from app.services.importacao_phc import importar_movimentos_phc
 
@@ -94,4 +96,11 @@ def entries_by_account_and_period(ano: int, mes: int, account_id: int):
 def del_entries_by_account_and_period(ano: int, mes: int, account_id: int):
     return delete_entries_by_account_and_period(ano, mes, account_id)
 
+@app.post("/bancos/upload/{ano}/{mes}")
+async def upload_bank_sheet_by_period(ano: int, mes: int, file: UploadFile = File(...)):
+    return await upload_bank_sheet(ano, mes, file)
+
+@app.post("/bancos/bulk/{ano}")
+def bank_bulk_import_year(ano: int):
+    return bank_bulk_import(ano)
 

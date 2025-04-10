@@ -8,7 +8,7 @@ class BancoExtrato(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     nome_conta = Column(String, nullable=False)
     data = Column(Date, nullable=False)
-    descricao = Column(String)
+    descricao = Column(String(500))
     valor = Column(Float)
     codigo_mecanografico = Column(String)
     ano_mes = Column(String, nullable=False)
