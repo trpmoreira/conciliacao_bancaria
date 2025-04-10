@@ -207,16 +207,17 @@ def delete_banco_by_id(id: int):
     except Exception as e:
         return {"Status": "Error", "Message": str(e)}
 
-def get_entries_by_account_and_period(mes: int, ano: int, account_id: int):
+def get_entries_by_account_and_period(ano: int, mes: int, account_id: int):
     try:
         session = Session()
+        print(f"Periodo: {ano}{mes:02d} Conta: {account_id}")
         entries = session.query(BancoExtrato).filter(BancoExtrato.id_conta_bancaria == account_id, BancoExtrato.ano_mes == f"{ano}{mes:02d}").all()
         session.close()
         return entries
     except Exception as e:
         return {"Status": "Error", "Message": str(e)}
 
-def delete_entries_by_account_and_period(account_id: int, mes: int, ano: int):
+def delete_entries_by_account_and_period(ano: int, mes: int, account_id: int):
     try:
         session = Session()
         session.query(BancoExtrato).filter(BancoExtrato.id_conta_bancaria == account_id, BancoExtrato.ano_mes == f"{ano}{mes:02d}").delete()
