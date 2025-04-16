@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 import pandas as pd
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.banco_extrato import BancoExtrato  # quando criares o modelo
-from datetime import date, datetime
 from sqlalchemy.orm import sessionmaker
 from app.db_info import delete_entries_by_account_and_period, engine_sqlite
 import os
@@ -30,7 +29,14 @@ def importar_movimentos_banco(ano: int, mes: int):
 
         try:
             deleted_entries[conta.id] = session.query(BancoExtrato).filter(BancoExtrato.id_conta_bancaria == conta.id, BancoExtrato.ano_mes == f"{ano}{mes:02d}").count()
-            delete_entries_by_account_and_period(conta.id, mes, ano)
+
+            if deleted_entries[conta.id] > 0:
+                session.query(BancoExtrato).filter(BancoExtrato.id_conta_bancaria == conta.id, BancoExtrato.ano_mes == f"{ano}{mes:02d}").delete()
+                session.commit()
+                print(f"Eliminados {deleted_entries[conta.id]} lançamentos da conta {conta.nome_conta} para o mês de {mes}/{ano}")
+
+                # TODO: Transformar o eliminar numa função para estar acessivel a outros serviços o delete_entries_by_account_and_period não esta a funcionar
+
         except Exception as e:
             print(f"Erro ao eliminar lançamentos: {e}")
 
@@ -44,15 +50,6 @@ def importar_movimentos_banco(ano: int, mes: int):
         # Converte a coluna de datas de forma vetorizada
         df.rename(columns={conta.excel_nome_data: "data"}, inplace=True)
         df["data"] = pd.to_datetime(df["data"], errors='coerce', dayfirst=True).fillna(pd.Timestamp(f"{ano}-{mes:02d}-01"))
-
-        coluna_valor = conta.excel_nome_valor
-        df[coluna_valor] = pd.to_numeric(
-            df[coluna_valor]
-            .astype(str)
-            .str.replace('.', '', regex=False)
-            .str.replace(',', '.', regex=False),
-            errors='coerce'
-        ).fillna(0.0)
 
         for _, row in df.iterrows():
 

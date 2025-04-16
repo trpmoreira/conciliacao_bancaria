@@ -217,6 +217,16 @@ def get_entries_by_account_and_period(ano: int, mes: int, account_id: int):
     except Exception as e:
         return {"Status": "Error", "Message": str(e)}
 
+def get_entries_by_period(ano: int, mes: int):
+    try:
+        session = Session()
+        print(f"Periodo: {ano}{mes:02d}")
+        entries = session.query(BancoExtrato).filter(BancoExtrato.ano_mes == f"{ano}{mes:02d}").all()
+        session.close()
+        return entries
+    except Exception as e:
+        return {"Status": "Error", "Message": str(e)}
+
 def delete_entries_by_account_and_period(ano: int, mes: int, account_id: int):
     try:
         session = Session()

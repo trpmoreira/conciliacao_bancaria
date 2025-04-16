@@ -28,7 +28,7 @@ def importar_movimentos_phc(ano: int, mes: int):
         # Apenas os movimentos da conta atual
         movimentos_filtrados = [m for m in movimentos_raw if m.get("Conta") == conta.conta_phc]
 
-        # ADicionar ao deleted_entries quantos movimentos existem
+        # Adicionar ao deleted_entries quantos movimentos existem
         deleted_entries[conta.conta_phc] = session.query(PHCMovimento).filter_by(
             conta_phc=conta.conta_phc,
             ano_mes=ano_mes
