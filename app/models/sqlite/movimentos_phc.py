@@ -9,7 +9,7 @@ class PHCMovimento(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     data = Column(Date, nullable=False)
     diario = Column(String)
-    numero = Column(Integer)
+    lancamento = Column(Integer)
     documento = Column(String)
     descricao = Column(Text)
     debito = Column(Float)

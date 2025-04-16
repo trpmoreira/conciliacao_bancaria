@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db_info import create_banco, delete_banco_by_id, delete_entries_by_account_and_period, get_bancos, get_contas_bancarias, get_entries_by_account_and_period, get_entries_by_date, get_entries_by_date_account, get_entries_by_period, init_db, test_phc_connection, test_sqlite_connection
 from app.schemas.phc_entries import PHCEntry
+from app.seed import seeder
+from app.services.check_movimento import check_movimentos_by_period
+from app.services.month_import import import_month
 from app.services.update_balance import update_balance
 from app.services.bank_sheet_bulk import bank_bulk_import
 from app.services.upload_bank_xlxs import upload_bank_sheet
@@ -30,6 +33,9 @@ init_db()
 
 # Status
 
+@app.post("/seed/")
+def initial_seed():
+    return seeder()
 
 @app.get("/status/")
 def read_root():
@@ -111,4 +117,12 @@ def bank_bulk_import_year(ano: int):
 @app.post("/bancos/balance/{period}")
 def update_balance_by_period(period: str):
     return update_balance(period)
+
+@app.post("/phc/check/{period}")
+def validate_movimentos_by_period(period: str):
+    return check_movimentos_by_period(period)
+
+@app.post("/phc/import/{ano}/{mes}")
+def import_month_(ano: int, mes: int):
+    return import_month(ano, mes)
 

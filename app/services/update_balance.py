@@ -33,19 +33,19 @@ def update_balance(period: str):
         phc_balance = session.query(func.sum(PHCMovimento.valor).label('total_valor')).filter(
             PHCMovimento.id_conta_bancaria == account.id, PHCMovimento.ano_mes == period).scalar()
 
-        def safe_number(value, name):
+        def safe_number(account, value, name):
             if isinstance(value, (int, float)):
                 return value
             try:
                 return float(value)
             except (TypeError, ValueError):
                 print(
-                    f"[AVISO] Valor inválido para '{name}': {value}. A assumir 0.")
+                    f"\033[33m[AVISO]\033[0m Valor inválido na conta \033[32m{account.nome_conta}\033[0m para '{name}': {value}. A assumir 0.")
             return 0.0
 
         # uso:
-        account_balance_safe = safe_number(account_balance, 'account_balance')
-        phc_balance_safe = safe_number(phc_balance, 'phc_balance')
+        account_balance_safe = safe_number(account, account_balance, 'account_balance')
+        phc_balance_safe = safe_number(account, phc_balance, 'phc_balance')
 
         diferenca = account_balance_safe - phc_balance_safe
 

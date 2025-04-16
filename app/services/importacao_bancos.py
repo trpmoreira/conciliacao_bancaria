@@ -48,8 +48,16 @@ def importar_movimentos_banco(ano: int, mes: int):
             continue
 
         # Converte a coluna de datas de forma vetorizada
-        df.rename(columns={conta.excel_nome_data: "data"}, inplace=True)
-        df["data"] = pd.to_datetime(df["data"], errors='coerce', dayfirst=True).fillna(pd.Timestamp(f"{ano}-{mes:02d}-01"))
+        #df.rename(columns={conta.excel_nome_data: "data"}, inplace=True)
+        #df["data"] = pd.to_datetime(df["data"], errors='coerce', dayfirst=True).fillna(pd.Timestamp(f"{ano}-{mes:02d}-01"))
+
+        coluna_data = conta.excel_nome_data
+        if coluna_data not in df.columns:
+            print(f"\033[33m[AVISO]\033[0m Coluna \033[32m'{coluna_data}'\033[0m não encontrada na folha \033[32m'{conta.excel_nome_folha}'\033[0m, criando 'data' com valor padrão")
+            df["data"] = pd.Timestamp(f"{ano}-{mes:02d}-01")
+        else:
+            df.rename(columns={coluna_data: "data"}, inplace=True)
+            df["data"] = pd.to_datetime(df["data"], errors='coerce', dayfirst=True).fillna(pd.Timestamp(f"{ano}-{mes:02d}-01"))
 
         for _, row in df.iterrows():
 

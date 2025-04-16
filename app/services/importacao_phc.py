@@ -19,8 +19,6 @@ def importar_movimentos_phc(ano: int, mes: int):
         print(f"▶️ A processar conta {conta.conta_phc} - {conta.nome_conta}")
         success, msg, movimentos_raw = get_entries_by_date(ano, mes)
 
-        movimentos = get_entries_by_date(ano, mes)
-
         if not success:
             print(f"❌ Erro ao procurar movimentos: {msg}")
             continue
@@ -46,7 +44,7 @@ def importar_movimentos_phc(ano: int, mes: int):
                 movimento = PHCMovimento(
                     data=entrada.data,
                     diario=entrada.diario,
-                    numero=entrada.numero,
+                    lancamento=entrada.numero,
                     documento=entrada.documento,
                     descricao=entrada.descricao,
                     debito=entrada.debito,
