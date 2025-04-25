@@ -3,6 +3,7 @@ import datetime
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.movimento_invalido import MovimentosInvalidos
 from app.models.sqlite.movimentos_phc import PHCMovimento
+from app.services.messages import mensagem_debug, mensagem_sucess, mensagem_warning
 from app.session import get_session
 
 
@@ -10,7 +11,7 @@ from app.session import get_session
 def adicionar_movimento_invalido(movimento: PHCMovimento, observacao: str):
   with get_session() as session:
 
-    print(f"Adicionando movimento inválido {movimento.documento} - {observacao}")
+    mensagem_warning(f"Adicionando movimento inválido {movimento.documento} - {observacao}")
 
     session.add(MovimentosInvalidos(
       atualizado_em=datetime.datetime.now()
@@ -26,6 +27,8 @@ def adicionar_movimento_invalido(movimento: PHCMovimento, observacao: str):
 
 def check_movimento_valido(movimento: PHCMovimento):
   with get_session() as session:
+
+    debug = False
 
     codigo_banco = session.query(ContaBancaria.codigo_banco).filter(ContaBancaria.id == movimento.id_conta_bancaria).scalar()
 
@@ -55,13 +58,31 @@ def check_movimento_valido(movimento: PHCMovimento):
       adicionar_movimento_invalido(movimento, "Código mecanográfico inválido, o código do banco não corresponde ao movimento")
       return
 
-    #print(f"Movimento {movimento.documento} validado com sucesso")
+    if debug:
+      mensagem_debug(f"Movimento {movimento.documento} validado com sucesso")
     return
 
 def check_movimentos_by_period(period: str):
+
+  delete_invalid_movimentos_by_period(period)
+
   with get_session() as session:
 
     movimentos = session.query(PHCMovimento).filter(PHCMovimento.ano_mes == period).all()
 
     for movimento in movimentos:
       check_movimento_valido(movimento)
+
+    mensagem_sucess(f"Movimentos validados com sucesso para o período \033[94m{period[4:]}/{period[:4]}\033[0m")
+
+def delete_invalid_movimentos_by_period(period: str):
+
+  debug = False
+
+  with get_session() as session:
+
+    deleted_entries = session.query(MovimentosInvalidos).filter(MovimentosInvalidos.ano_mes == period).count()
+    session.query(MovimentosInvalidos).filter(MovimentosInvalidos.ano_mes == period).delete()
+    session.commit()
+    if debug:
+      mensagem_debug(f"\033[91mEliminados {deleted_entries} movimentos inválidos\033[0m para o período \033[94m{period[4:]}/{period[:4]}\033[0m")
