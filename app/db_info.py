@@ -8,6 +8,7 @@ from app.models.sqlite.base import Base
 from app.models.sqlite.banco import Banco
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.movimentos_phc import PHCMovimento
+from app.schemas.phc_bank_entrie import BankEntry
 
 load_dotenv()
 
@@ -130,6 +131,38 @@ def get_entries_by_date_account(year: int, month: int, account: str):
         return True, f"{len(entries)} lançamentos encontrados", entries
     except Exception as e:
         return {"Status": "Error", "Message": str(e)}
+
+def get_bank_entries_by_date_account(year: int, month: int, account: str):
+    try:
+        conn = engine_phc.connect()
+        cursor = conn.connection.cursor()
+        cursor.execute(f"""
+            SELECT
+                CONVERT(VARCHAR(10), data, 103) AS "Data"
+                , CONVERT(varchar(8), data, 112) AS "Data Formatada"
+                , dilno AS "Número"
+                , adoc AS "Documento"
+                , descritivo AS "Descrição"
+                , edeb AS "Débito"
+                , ecre AS "Crédito"
+                , conta AS "Conta"
+                , descricao AS "Nome Conta"
+            FROM ml
+            WHERE YEAR(data) = {year}
+            AND MONTH(data) = {month}
+            AND dostamp in (SELECT dostamp FROM ml WHERE conta = '{account}' AND YEAR(data) = {year})
+            ORDER BY [Data Formatada], dilno
+        """)
+        columns = [desc[0] for desc in cursor.description]
+        rows = cursor.fetchall()
+        conn.close()
+
+        entries = [BankEntry(**dict(zip(columns, row))) for row in rows]
+
+        return True, f"{len(entries)} lançamentos encontrados", entries
+    except Exception as e:
+        return False, str(e), []
+
 
 def get_contas_bancarias():
     try:

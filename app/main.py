@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db_info import create_banco, delete_banco_by_id, delete_entries_by_account_and_period, get_bancos, get_contas_bancarias, get_entries_by_account_and_period, get_entries_by_date, get_entries_by_date_account, get_entries_by_period, init_db, test_phc_connection, test_sqlite_connection
 from app.schemas.phc_entries import PHCEntry
 from app.seed import seeder
+from app.services.import_bank_entries import import_bank_entries
 from app.services.check_movimento import check_movimentos_by_period
 from app.services.import_chave_ligacao import get_chave_ligacao, import_chave_ligacao
 from app.services.month_import import import_month, import_year
@@ -127,6 +128,10 @@ def validate_movimentos_by_period(period: str):
 def import_month_(ano: int, mes: int):
     return import_month(ano, mes)
 
+@app.post("/bancos/import/bank_entries/{ano}/{mes}")
+def import_bank_entries_(ano: int, mes: int):
+    return import_bank_entries(ano, mes)
+
 @app.post("/bancos/import/{ano}")
 def import_bancos_year(ano: int):
     return import_year(ano)
@@ -138,4 +143,6 @@ async def upload_chave_ligacao_file(file: UploadFile = File(...)):
 @app.post("/chaveligacao/import/")
 def import_chave_ligacao_from_file():
     return import_chave_ligacao()
+
+
 
