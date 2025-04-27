@@ -16,6 +16,7 @@ class ContaBancaria(Base):
     excel_nome_codigo_mecanografico = Column(String, nullable=False)
     excel_nome_data = Column(String, nullable=False)
     codigo_banco = Column(String, nullable=False, unique=True)
+    diario_brasague = Column(Integer, unique=True)
 
 
     id_banco = Column(Integer, ForeignKey("bancos.id"))

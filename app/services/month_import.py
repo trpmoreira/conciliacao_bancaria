@@ -17,3 +17,8 @@ def import_month(ano: int, mes: int):
     mensagem_sucess(f"Importação do mês \033[94m{mes:02d}/{ano}\033[0m concluída com sucesso")
     print("\n")
 
+
+def import_year(ano: int):
+    for mes in range(1, 13):
+        import_month(ano, mes)
+

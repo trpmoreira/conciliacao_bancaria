@@ -5,7 +5,8 @@ from app.db_info import create_banco, delete_banco_by_id, delete_entries_by_acco
 from app.schemas.phc_entries import PHCEntry
 from app.seed import seeder
 from app.services.check_movimento import check_movimentos_by_period
-from app.services.month_import import import_month
+from app.services.import_chave_ligacao import get_chave_ligacao, import_chave_ligacao
+from app.services.month_import import import_month, import_year
 from app.services.update_balance import update_balance
 from app.services.bank_sheet_bulk import bank_bulk_import
 from app.services.upload_bank_xlxs import upload_bank_sheet
@@ -125,4 +126,16 @@ def validate_movimentos_by_period(period: str):
 @app.post("/phc/import/{ano}/{mes}")
 def import_month_(ano: int, mes: int):
     return import_month(ano, mes)
+
+@app.post("/bancos/import/{ano}")
+def import_bancos_year(ano: int):
+    return import_year(ano)
+
+@app.post("/chaveligacao/upload/")
+async def upload_chave_ligacao_file(file: UploadFile = File(...)):
+    return await get_chave_ligacao(file)
+
+@app.post("/chaveligacao/import/")
+def import_chave_ligacao_from_file():
+    return import_chave_ligacao()
 

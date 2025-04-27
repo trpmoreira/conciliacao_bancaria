@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
 import pandas as pd
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.banco_extrato import BancoExtrato  # quando criares o modelo
