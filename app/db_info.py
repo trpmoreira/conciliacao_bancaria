@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
 import os
 
@@ -7,7 +8,6 @@ from app.models.sqlite.banco_extrato import BancoExtrato
 from app.models.sqlite.base import Base
 from app.models.sqlite.banco import Banco
 from app.models.sqlite.conta_bancaria import ContaBancaria
-from app.models.sqlite.movimentos_phc import PHCMovimento
 from app.schemas.phc_bank_entrie import BankEntry
 
 load_dotenv()
@@ -36,8 +36,9 @@ def test_phc_connection():
         cursor.execute("SELECT top 1 * FROM ml")
         conn.close()
         return {"Status": "OK", "Message": "Conexão com PHC estabelecida"}
-    except Exception as e:
+    except SQLAlchemyError as e:
         return {"Status": "Error", "Message": str(e)}
+
 
 def test_sqlite_connection():
     try:

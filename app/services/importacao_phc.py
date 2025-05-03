@@ -3,10 +3,11 @@ from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.schemas.phc_entries import PHCEntry
 from app.db_info import get_entries_by_date
 
-from app.services.messages import mensagem_debug, mensagem_error, mensagem_sucess
+from app.utils.decorators import test_connection
+from app.utils.messages import mensagem_debug, mensagem_error, mensagem_sucess
 from app.session import get_session
 
-
+@test_connection
 def importar_movimentos_phc(ano: int, mes: int):
 
     debug = False

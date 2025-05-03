@@ -1,10 +1,12 @@
-from app.services.messages import mensagem_info, mensagem_sucess
+from app.utils.decorators import test_connection
+from app.utils.messages import mensagem_info, mensagem_sucess
 from app.services.update_balance import update_balance
 from app.services.check_movimento import check_movimentos_by_period
 from app.services.importacao_bancos import importar_movimentos_banco
 from app.services.importacao_phc import importar_movimentos_phc
 from app.services.conciliacao import conciliacao_movimentos
 
+@test_connection
 def import_month(ano: int, mes: int):
 
     print("\n")

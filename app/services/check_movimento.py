@@ -3,7 +3,7 @@ import datetime
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.movimento_invalido import MovimentosInvalidos
 from app.models.sqlite.movimentos_phc import PHCMovimento
-from app.services.messages import mensagem_debug, mensagem_sucess, mensagem_warning
+from app.utils.messages import mensagem_debug, mensagem_sucess, mensagem_warning
 from app.session import get_session
 
 

@@ -5,7 +5,7 @@ from app.models.sqlite.banco_extrato import BancoExtrato
 from app.models.sqlite.bancos_saldos import BancosSaldos
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.movimentos_phc import PHCMovimento
-from app.services.messages import mensagem_debug, mensagem_sucess, mensagem_warning
+from app.utils.messages import mensagem_debug, mensagem_sucess, mensagem_warning
 from app.session import get_session
 
 

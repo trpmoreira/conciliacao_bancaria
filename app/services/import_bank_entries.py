@@ -4,7 +4,7 @@ from sqlalchemy import extract
 from app.db_info import get_bank_entries_by_date_account
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.movimentos_bancarios_phc import MovimentosBancariosPHC
-from app.services.messages import mensagem_debug, mensagem_error, mensagem_sucess
+from app.utils.messages import mensagem_debug, mensagem_error, mensagem_sucess
 from app.session import get_session
 
 

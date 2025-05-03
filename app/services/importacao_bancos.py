@@ -3,7 +3,7 @@ import pandas as pd
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.banco_extrato import BancoExtrato  # quando criares o modelo
 from app.session import get_session
-from app.services.messages import mensagem_debug, mensagem_error, mensagem_sucess, mensagem_warning
+from app.utils.messages import mensagem_debug, mensagem_error, mensagem_sucess, mensagem_warning
 import os
 
 def importar_movimentos_banco(ano: int, mes: int):

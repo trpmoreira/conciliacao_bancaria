@@ -3,7 +3,7 @@ from app.models.sqlite.banco_extrato import BancoExtrato
 from app.models.sqlite.conciliacao_movimentos import ConciliacaoMovimentos
 from app.models.sqlite.conta_bancaria import ContaBancaria
 from app.models.sqlite.movimentos_phc import PHCMovimento
-from app.services.messages import mensagem_debug, mensagem_error, mensagem_sucess
+from app.utils.messages import mensagem_debug, mensagem_error, mensagem_sucess
 from app.session import get_session
 
 
